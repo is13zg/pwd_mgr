@@ -21,64 +21,71 @@ class Database:
                                     E_who_view TEXT
                                 ); """)
 
-
     def book_exists(self, name):
         with self.connection:
             res = self.cursor.execute("SELECT * FROM `books_view_count` WHERE `name` = ?", (name,)).fetchmany(1)
             return bool(len(res))
 
-    def add_pswd_record(self, table_name, name, count):
+    def add_pswd_record(self, table_name, name, login, E_pswd, url, E_secret, comment, E_who_view, ):
         with self.connection:
-            return self.cursor.execute("INSERT INTO `books_view_count` (`name`,`view_count`) VALUES (?,?)",
-                                       (name, count))
+            return self.cursor.execute(
+                f"INSERT INTO `{table_name}` "
+                f"('name',  'login', 'E_pswd', 'url', 'E_secret', 'comment', 'E_who_view') "
+                f"VALUES ({name},  {login}, {E_pswd}, {url}, {E_secret}, {comment}, {E_who_view})")
 
-    def add_book_view(self, name):
+    def add_pswd_view(self, table_name,key, E_who_view):
         with self.connection:
-            return self.cursor.execute("UPDATE `books_view_count` SET `view_count` = `view_count` + 1 WHERE `name`=?",
-                                       (name,))
+            self.cursor.execute(f"UPDATE `{table_name}` SET `E_who_view` = '{E_who_view}' WHERE `id`='{key}'")
 
-    def get_books_stat(self):
-        with self.connection:
-            return self.cursor.execute("SELECT `name`, `view_count` FROM `books_view_count`").fetchall()
 
-    def user_exists(self, user_id):
-        with self.connection:
-            res = self.cursor.execute("SELECT * FROM `users` WHERE `user_id` = ?", (user_id,)).fetchmany(1)
-            return bool(len(res))
+            def add_book_view(self, name):
+                with self.connection:
+                    return self.cursor.execute(
+                        "UPDATE `books_view_count` SET `view_count` = `view_count` + 1 WHERE `name`=?",
+                        (name,))
 
-    def add_user(self, user_id):
-        with self.connection:
-            return self.cursor.execute("INSERT INTO `users` (`user_id`) VALUES (?)", (user_id,))
+            def get_books_stat(self):
+                with self.connection:
+                    return self.cursor.execute("SELECT `name`, `view_count` FROM `books_view_count`").fetchall()
 
-    def count_users(self):
-        with self.connection:
-            return self.cursor.execute("SELECT COUNT(*) from `users`").fetchmany(1)
+            def user_exists(self, user_id):
+                with self.connection:
+                    res = self.cursor.execute("SELECT * FROM `users` WHERE `user_id` = ?", (user_id,)).fetchmany(1)
+                    return bool(len(res))
 
-    def count_active_user(self):
-        with self.connection:
-            return self.cursor.execute("SELECT COUNT(*) from `users`  WHERE `active` = 1").fetchmany(1)
+            def add_user(self, user_id):
+                with self.connection:
+                    return self.cursor.execute("INSERT INTO `users` (`user_id`) VALUES (?)", (user_id,))
 
-    def set_active(self, user_id, active):
-        with self.connection:
-            return self.cursor.execute("UPDATE `users` SET `active` = ? WHERE `user_id`=?", (active, user_id,))
+            def count_users(self):
+                with self.connection:
+                    return self.cursor.execute("SELECT COUNT(*) from `users`").fetchmany(1)
 
-    def get_users(self):
-        with self.connection:
-            return self.cursor.execute("SELECT `user_id`, `active` FROM `users`").fetchall()
+            def count_active_user(self):
+                with self.connection:
+                    return self.cursor.execute("SELECT COUNT(*) from `users`  WHERE `active` = 1").fetchmany(1)
 
-    def admin_exists(self, admin_id):
-        with self.connection:
-            res = self.cursor.execute("SELECT * FROM `admins` WHERE `admin_id` = ?", (admin_id,)).fetchmany(1)
-            return bool(len(res))
+            def set_active(self, user_id, active):
+                with self.connection:
+                    return self.cursor.execute("UPDATE `users` SET `active` = ? WHERE `user_id`=?", (active, user_id,))
 
-    def add_admin(self, admin_id, name):
-        with self.connection:
-            return self.cursor.execute("INSERT INTO `admins` (`admin_id`,name) VALUES (?,?)", (admin_id, name,))
+            def get_users(self):
+                with self.connection:
+                    return self.cursor.execute("SELECT `user_id`, `active` FROM `users`").fetchall()
 
-    def del_admin(self, admin_id):
-        with self.connection:
-            return self.cursor.execute("DELETE FROM `admins` WHERE `admin_id` = ?", (admin_id,))
+            def admin_exists(self, admin_id):
+                with self.connection:
+                    res = self.cursor.execute("SELECT * FROM `admins` WHERE `admin_id` = ?", (admin_id,)).fetchmany(1)
+                    return bool(len(res))
 
-    def get_admins(self):
-        with self.connection:
-            return self.cursor.execute("SELECT `admin_id`,`name` FROM `admins`").fetchall()
+            def add_admin(self, admin_id, name):
+                with self.connection:
+                    return self.cursor.execute("INSERT INTO `admins` (`admin_id`,name) VALUES (?,?)", (admin_id, name,))
+
+            def del_admin(self, admin_id):
+                with self.connection:
+                    return self.cursor.execute("DELETE FROM `admins` WHERE `admin_id` = ?", (admin_id,))
+
+            def get_admins(self):
+                with self.connection:
+                    return self.cursor.execute("SELECT `admin_id`,`name` FROM `admins`").fetchall()
