@@ -6,12 +6,28 @@ class Database:
         self.connection = sqlite3.connect(db_file)
         self.cursor = self.connection.cursor()
 
+    def create_new_pswd_table(self, table_name):
+        with self.connection:
+            print(table_name)
+            self.cursor.execute(f""" CREATE TABLE IF NOT EXISTS "{table_name}" (
+                                    id         INTEGER PRIMARY KEY AUTOINCREMENT
+                                                       UNIQUE,
+                                    name       TEXT,
+                                    login      TEXT,
+                                    E_pswd     TEXT    NOT NULL,
+                                    url        TEXT,
+                                    E_secret   TEXT,
+                                    comment    TEXT,
+                                    E_who_view TEXT
+                                ); """)
+
+
     def book_exists(self, name):
         with self.connection:
             res = self.cursor.execute("SELECT * FROM `books_view_count` WHERE `name` = ?", (name,)).fetchmany(1)
             return bool(len(res))
 
-    def add_book(self, name, count):
+    def add_pswd_record(self, table_name, name, count):
         with self.connection:
             return self.cursor.execute("INSERT INTO `books_view_count` (`name`,`view_count`) VALUES (?,?)",
                                        (name, count))
