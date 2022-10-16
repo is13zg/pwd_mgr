@@ -3,40 +3,67 @@ import sqlite3
 
 class Database:
     def __init__(self, db_file):
-        self.connection = sqlite3.connect(db_file)
-        self.cursor = self.connection.cursor()
+        try:
+            self.connection = sqlite3.connect(db_file)
+            self.cursor = self.connection.cursor()
+        except Exception as e:
+            pass
+
+
 
     def create_new_pswd_table(self, table_name):
-        with self.connection:
-            print(table_name)
-            self.cursor.execute(f""" CREATE TABLE IF NOT EXISTS "{table_name}" (
-                                    id         INTEGER PRIMARY KEY AUTOINCREMENT
-                                                       UNIQUE,
-                                    name       TEXT,
-                                    login      TEXT,
-                                    E_pswd     TEXT    NOT NULL,
-                                    url        TEXT,
-                                    E_secret   TEXT,
-                                    comment    TEXT,
-                                    E_who_view TEXT
-                                ); """)
+        try:
+            with self.connection:
+                print(table_name)
+                self.cursor.execute(f""" CREATE TABLE IF NOT EXISTS "{table_name}" (
+                                        id         INTEGER PRIMARY KEY AUTOINCREMENT
+                                                           UNIQUE,
+                                        name       TEXT,
+                                        login      TEXT,
+                                        E_pswd     TEXT    NOT NULL,
+                                        url        TEXT,
+                                        E_secret   TEXT,
+                                        comment    TEXT,
+                                        E_who_view TEXT
+                                    ); """)
+        except Exception as e:
+            pass
 
-    def book_exists(self, name):
-        with self.connection:
-            res = self.cursor.execute("SELECT * FROM `books_view_count` WHERE `name` = ?", (name,)).fetchmany(1)
-            return bool(len(res))
+    def get_all_pswds(self, name: str) -> list:
+        try:
+            with self.connection:
+                return self.cursor.execute(f"SELECT * FROM `{name}`").fetchall()
+        except Exception as e:
+            pass
+
+    def get_filter_pswds(self, table_name: str, search_str: str) -> list:
+        all_pswd = self.get_all_pswds(table_name)
+        res = []
+        for record in all_pswd:
+            pass
 
     def add_pswd_record(self, table_name, name, login, E_pswd, url, E_secret, comment, E_who_view, ):
-        with self.connection:
-            return self.cursor.execute(
-                f"INSERT INTO `{table_name}` "
-                f"('name',  'login', 'E_pswd', 'url', 'E_secret', 'comment', 'E_who_view') "
-                f"VALUES ({name},  {login}, {E_pswd}, {url}, {E_secret}, {comment}, {E_who_view})")
+        try:
+            with self.connection:
+                return self.cursor.execute(
+                    f"INSERT INTO `{table_name}` "
+                    f"('name',  'login', 'E_pswd', 'url', 'E_secret', 'comment', 'E_who_view') "
+                    f"VALUES ({name},  {login}, {E_pswd}, {url}, {E_secret}, {comment}, {E_who_view})")
+        except Exception as e:
+            pass
+
 
     def add_pswd_view(self, table_name,key, E_who_view):
-        with self.connection:
-            self.cursor.execute(f"UPDATE `{table_name}` SET `E_who_view` = '{E_who_view}' WHERE `id`='{key}'")
+        try:
+            with self.connection:
+                self.cursor.execute(f"UPDATE `{table_name}` SET `E_who_view` = '{E_who_view}' WHERE `id`='{key}'")
+        except Exception as e:
+            pass
 
+            def book_exists(self, name):
+                with self.connection:
+                    res = self.cursor.execute("SELECT * FROM `books_view_count` WHERE `name` = ?", (name,)).fetchmany(1)
+                    return bool(len(res))
 
             def add_book_view(self, name):
                 with self.connection:
